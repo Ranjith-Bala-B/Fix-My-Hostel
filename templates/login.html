@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Fix My Hostel — SECE Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      background: #0b0f1a;
+      overflow: hidden;
+    }
+ 
+    /* LEFT PANEL */
+    .left {
+      flex: 1;
+      position: relative;
+      background: url("{{ url_for('static', filename='hostelimage.png') }}") center / cover no-repeat;
+    }
+    .left-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(125deg, rgba(5,15,45,0.88) 0%, rgba(0,0,0,0.55) 100%);
+      display: flex; flex-direction: column;
+      justify-content: space-between;
+      padding: 44px 52px;
+    }
+    .top-logo {
+      display: inline-flex; align-items: center; gap: 12px;
+      background: rgba(255,255,255,0.97); border-radius: 12px;
+      padding: 10px 20px; width: fit-content;
+    }
+    .top-logo img { height: 40px; display: block; }
+    .pill {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: rgba(255,200,0,0.14); border: 1px solid rgba(255,200,0,0.38);
+      color: #ffd700; font-size: 10px; font-weight: 700;
+      letter-spacing: 2.4px; text-transform: uppercase;
+      padding: 5px 14px; border-radius: 30px; margin-bottom: 22px;
+    }
+    .head-text h1 {
+      font-family: 'Sora', sans-serif;
+      font-size: clamp(28px, 3vw, 46px);
+      color: #fff; line-height: 1.18; margin-bottom: 14px;
+    }
+    .head-text h1 span { color: #ffd700; }
+    .head-text p {
+      color: rgba(255,255,255,0.72); font-size: 14px;
+      line-height: 1.85; max-width: 380px; margin-bottom: 32px;
+    }
+    .stats { display: flex; border-top: 1px solid rgba(255,255,255,0.18); padding-top: 26px; }
+    .stat { flex: 1; padding-right: 24px; border-right: 1px solid rgba(255,255,255,0.12); margin-right: 24px; }
+    .stat:last-child { border-right: none; margin-right: 0; }
+    .stat-n { font-family: 'Sora', sans-serif; font-size: 28px; font-weight: 800; color: #ffd700; line-height: 1; }
+    .stat-l { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 4px; }
+ 
+    /* RIGHT PANEL */
+    .right {
+      width: 480px; min-width: 480px;
+      background: #0d1220;
+      border-left: 1px solid rgba(255,255,255,0.07);
+      display: flex; flex-direction: column;
+      justify-content: center;
+      padding: 52px 50px;
+      position: relative; overflow: hidden;
+    }
+    .right::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0;
+      height: 3px; background: linear-gradient(90deg, #1565e0, #ffd700);
+    }
+    .glow { position: absolute; border-radius: 50%; filter: blur(100px); pointer-events: none; }
+    .g1 { width: 300px; height: 300px; background: #1565e0; opacity: 0.07; top: -80px; right: -80px; }
+    .g2 { width: 200px; height: 200px; background: #ffd700; opacity: 0.04; bottom: 40px; left: -70px; }
+ 
+    .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 40px; }
+    .brand-icon {
+      width: 42px; height: 42px;
+      background: linear-gradient(135deg, #1565e0, #f5c842);
+      border-radius: 11px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+    }
+    .brand-name { font-family: 'Sora', sans-serif; font-size: 21px; color: white; }
+    .brand-name span { color: #ffd700; }
+ 
+    .form-head h2 { font-family: 'Sora', sans-serif; font-size: 26px; color: white; margin-bottom: 6px; }
+    .form-head p { font-size: 13px; color: #a8b3cf; margin-bottom: 32px; line-height: 1.65; }
+ 
+    .field { margin-bottom: 20px; }
+    .field label {
+      display: block; font-size: 11px; font-weight: 700;
+      letter-spacing: 1.1px; text-transform: uppercase;
+      color: #a8b3cf; margin-bottom: 8px;
+    }
+    .iw { position: relative; }
+    .iw .ico {
+      position: absolute; left: 14px; top: 50%;
+      transform: translateY(-50%); font-size: 14px;
+      opacity: 0.32; pointer-events: none;
+    }
+    .field input {
+      width: 100%; padding: 13px 16px 13px 42px;
+      background: rgba(255,255,255,0.04);
+      border: 1.5px solid rgba(255,255,255,0.09);
+      border-radius: 10px; color: white;
+      font-family: 'Inter', sans-serif; font-size: 14px;
+      outline: none; transition: border-color .22s, box-shadow .22s;
+    }
+    #password { padding-right: 48px; }
+    .field input::placeholder { color: #273044; }
+    .field input:focus {
+      border-color: #1565e0;
+      box-shadow: 0 0 0 3px rgba(21,101,224,0.14);
+      background: rgba(21,101,224,0.03);
+    }
+ 
+    /* PASSWORD VISIBILITY TOGGLE */
+    .pw-toggle {
+      position: absolute; right: 12px; top: 50%;
+      transform: translateY(-50%);
+      background: none; border: none; cursor: pointer;
+      color: #4e5d78; padding: 4px;
+      border-radius: 6px; line-height: 1;
+      display: flex; align-items: center; justify-content: center;
+      transition: color .18s, background .18s;
+    }
+    .pw-toggle:hover {
+      color: #c9d4e8;
+      background: rgba(255,255,255,0.07);
+    }
+    .pw-toggle svg {
+      width: 17px; height: 17px;
+      stroke: currentColor; fill: none;
+      stroke-width: 1.8px; stroke-linecap: round; stroke-linejoin: round;
+    }
+ 
+    .btn-login {
+      width: 100%; margin-top: 8px; padding: 14px;
+      background: linear-gradient(135deg, #1565e0, #0d47a1);
+      border: none; border-radius: 10px; color: white;
+      font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 600;
+      cursor: pointer; letter-spacing: 0.3px;
+      transition: transform .2s, box-shadow .2s;
+      box-shadow: 0 4px 20px rgba(21,101,224,0.38);
+    }
+    .btn-login:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(21,101,224,0.55); }
+    .btn-login:active { transform: translateY(0); }
+ 
+    .err {
+      margin-top: 16px; padding: 12px 16px;
+      background: rgba(239,68,68,0.09);
+      border: 1px solid rgba(239,68,68,0.26);
+      border-radius: 9px; color: #f87171;
+      font-size: 13px; display: flex; align-items: center; gap: 9px;
+      animation: errIn .28s ease;
+    }
+    @keyframes errIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+ 
+    .shake { animation: shake .36s ease; }
+    @keyframes shake {
+      0%,100%{transform:translateX(0)}
+      20%{transform:translateX(-7px)}
+      40%{transform:translateX(7px)}
+      60%{transform:translateX(-4px)}
+      80%{transform:translateX(4px)}
+    }
+ 
+    hr.divider { border: none; border-top: 1px solid rgba(255,255,255,0.06); margin: 26px 0; }
+    .footer { text-align: center; }
+    .footer p { font-size: 11px; color: #273044; line-height: 1.7; }
+ 
+    @media (max-width: 860px) {
+      .left { display: none; }
+      .right { width: 100%; min-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="left">
+    <div class="left-overlay">
+      <div class="top-logo">
+        <img src="https://sece.ac.in/wp-content/uploads/2024/05/clg-logo2-1536x438.webp" alt="SECE Logo">
+      </div>
+      <div class="head-text">
+        <div class="pill">🏛 SECE Hostel Management System</div>
+        <h1>Fix My Hostel —<br><span>Faster Every Time.</span></h1>
+        <p>Sri Eshwar College of Engineering's official platform for reporting and tracking hostel maintenance issues. Submit once, resolved fast.</p>
+        <div class="stats">
+          <div class="stat"><div class="stat-n">24h</div><div class="stat-l">Avg. Response</div></div>
+          <div class="stat"><div class="stat-n">6+</div><div class="stat-l">Issue Categories</div></div>
+          <div class="stat"><div class="stat-n">100%</div><div class="stat-l">SECE Students</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+ 
+  <div class="right">
+    <div class="glow g1"></div>
+    <div class="glow g2"></div>
+ 
+    <div class="brand">
+      <div class="brand-icon">🏠</div>
+      <div class="brand-name">Fix My <span>Hostel</span></div>
+    </div>
+ 
+    <div class="form-head">
+      <h2>Student Login</h2>
+      <p>Sign in with your official SECE college email and password to access the hostel grievance portal.</p>
+    </div>
+ 
+    <!-- FIX 1: Removed autocomplete="off" from <form> — it conflicted with field-level autocomplete attributes -->
+    <form action="/login" method="POST" id="loginForm">
+      <div class="field">
+        <!-- FIX 2: Added for/id pairing on label+input for accessibility -->
+        <label for="email">College Email</label>
+        <div class="iw">
+          <span class="ico">✉</span>
+          <input type="email" name="email" id="email"
+                 placeholder="yourname2025@sece.ac.in"
+                 required autocomplete="username">
+          <!-- FIX 3: Changed type="text" → type="email" for proper validation -->
+        </div>
+      </div>
+ 
+      <div class="field">
+        <label for="password">Password</label>
+        <div class="iw">
+          <span class="ico">🔒</span>
+          <input type="password" name="password" id="password"
+                 placeholder="Enter your password"
+                 required autocomplete="current-password">
+ 
+          <button type="button" class="pw-toggle" id="pwToggle"
+                  aria-label="Toggle password visibility"
+                  aria-pressed="false">
+            <!-- Eye open (shown when password is hidden) -->
+            <svg id="iconEye" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+            <!-- Eye closed (shown when password is visible) -->
+            <svg id="iconEyeOff" viewBox="0 0 24 24" style="display:none;" aria-hidden="true">
+              <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/>
+              <line x1="1" y1="1" x2="23" y2="23"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+ 
+      <button type="submit" class="btn-login">Login to Portal →</button>
+ 
+      {% if error %}
+      <div class="err" role="alert">⚠ {{ error }}</div>
+      {% endif %}
+    </form>
+ 
+    <hr class="divider">
+    <div class="footer">
+      <p>Sri Eshwar College of Engineering<br>Hostel Grievance &amp; Maintenance Portal · 2025</p>
+    </div>
+  </div>
+ 
+  <script>
+    // FIX 4: Removed inline onclick="togglePw()" — event listener attached properly here
+    // Also updates aria-pressed for screen readers
+    document.getElementById('pwToggle').addEventListener('click', function () {
+      const inp     = document.getElementById('password');
+      const isHidden = inp.type === 'password';
+      inp.type      = isHidden ? 'text' : 'password';
+      document.getElementById('iconEye').style.display    = isHidden ? 'none' : '';
+      document.getElementById('iconEyeOff').style.display = isHidden ? ''     : 'none';
+      this.setAttribute('aria-pressed', isHidden ? 'true' : 'false');
+    });
+ 
+    // Shake form on error
+    {% if error %}
+    window.addEventListener('DOMContentLoaded', function () {
+      const f = document.getElementById('loginForm');
+      f.classList.add('shake');
+      f.addEventListener('animationend', () => f.classList.remove('shake'), { once: true });
+    });
+    {% endif %}
+  </script>
+</body>
+</html>
+ 
